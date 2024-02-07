@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flask_login import current_user, login_user
+from flask_login import current_user, login_required, login_user, logout_user
 from flask_wtf.csrf import generate_csrf
 
 from api import db, login_manager
@@ -46,6 +46,13 @@ def login():
                 return {"error": "Incorrect credentials"}, 401
 
     return {"message": "Logged in successfully"}, 200
+
+
+@login_required
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    logout_user()
+    return {"message": "Successfully logged out"}, 200
 
 
 @auth_bp.route("/signup", methods=["POST"])
