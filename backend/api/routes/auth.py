@@ -9,6 +9,20 @@ from ..models.account import Account
 
 auth_bp = Blueprint("auth", __name__)
 
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id is not None:
+        return Account.query.get(int(user_id))
+    return None
+
+
+@login_manager.unauthorized_handler
+@auth_bp.route("/unauthorized", methods=["GET"])
+def unauthorized():
+    return {"error": "not authorized"}, 401
+
+
 @auth_bp.route("/csrf", methods=["GET"])
 def get_csrf():
     response = jsonify(detail="success")
@@ -18,6 +32,19 @@ def get_csrf():
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
+    if not current_user.is_authenticated:
+        form = LoginForm(request.form)
+        if form.validate():
+            email = form.email.data
+            password = form.password.data
+            account = db.session.scalar(
+                db.select(Account).filter_by(email=email).limit(1),
+            )
+            if account and account.check_password(password):
+                login_user(account)
+            else:
+                return {"error": "Incorrect credentials"}, 401
+
     return {"message": "Logged in successfully"}, 200
 
 
@@ -28,7 +55,6 @@ def signup():
     if not form.validate():
         return {"error": "Invalid form data"}, 400
 
-    username = form.username.data
     email = form.email.data
     password = form.password.data
 
@@ -49,8 +75,3 @@ def signup():
     login_user(account)
 
     return {"message": "Account created successfully"}, 201
-
-
-# from flask_wtf.csrf import generate_csrf
-
-#     csrf_token = generate_csrf()
