@@ -1,7 +1,10 @@
-from flask import Blueprint, request
-from api import db
+from flask import Blueprint, jsonify, request
+from flask_login import current_user, login_user
+from flask_wtf.csrf import generate_csrf
+
+from api import db, login_manager
+from ..forms.account import LoginForm, SignupForm
 from ..models.account import Account
-from ..forms.account import SignupForm
 
 
 auth_bp = Blueprint("auth", __name__)
