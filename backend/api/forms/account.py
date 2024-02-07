@@ -9,13 +9,6 @@ from wtforms.validators import (
 
 
 class SignupForm(FlaskForm):
-    username = StringField(
-        "Username",
-        validators=[
-            DataRequired(),
-            Length(min=4, max=25),
-        ],
-    )
     email = EmailField(
         "Email",
         validators=[
@@ -42,5 +35,21 @@ class SignupForm(FlaskForm):
                 "password",
                 message="Passwords must match.",
             ),
+        ],
+    )
+
+
+class LoginForm(FlaskForm):
+    email = EmailField(
+        "Email",
+        validators=[
+            DataRequired(),
+            Email(message="Enter a valid email."),
+        ],
+    )
+    password = PasswordField(
+        "Password",
+        validators=[
+            DataRequired(),
         ],
     )
