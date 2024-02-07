@@ -32,21 +32,21 @@ def signup():
     email = form.email.data
     password = form.password.data
 
-    account = db.session.execute(
-        db.select(Account).filter_by(email=email),
-    ).first()
+    account = db.session.scalar(
+        db.select(Account).filter_by(email=email).limit(1),
+    )
 
     if account:
         return {"error": "Account already exists"}, 400
 
     account = Account(
-        username=username,
         email=email,
     )
     account.set_password(password)
 
     db.session.add(account)
     db.session.commit()
+    login_user(account)
 
     return {"message": "Account created successfully"}, 201
 
