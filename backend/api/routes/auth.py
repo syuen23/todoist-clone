@@ -6,6 +6,12 @@ from ..forms.account import SignupForm
 
 auth_bp = Blueprint("auth", __name__)
 
+@auth_bp.route("/csrf", methods=["GET"])
+def get_csrf():
+    response = jsonify(detail="success")
+    response.headers.set("X-CSRFToken", generate_csrf())
+    return response
+
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
