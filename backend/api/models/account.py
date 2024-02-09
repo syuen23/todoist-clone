@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 class Account(UserMixin, db.Model):
     __tablename__ = "account"
 
-    id = db.Column(
+    account_id = db.Column(
         db.Integer,
         primary_key=True,
     )
@@ -20,6 +20,12 @@ class Account(UserMixin, db.Model):
         primary_key=False,
         unique=False,
         nullable=False,
+    )
+
+    projects = db.relationship(
+        "project",
+        back_populates="account",
+        lazy=True,
     )
 
     def set_password(self, password):
